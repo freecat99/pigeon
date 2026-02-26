@@ -22,14 +22,26 @@ const io = new Server(secureServer, {
     },
 });
 
+secureServer.listen(1601, ()=>{
+    console.log("signaling server started");
+});
+
+const connectedSocket = [
+    //username
+    //socket.id
+];
+
 //listening for connections to socket server
 io.on('connection', (socket)=>{
+
+    const userLink = socket.handshake.auth.userLink;
+    connectedSocket.push({
+        userLink,
+        socketId: socket.id
+    })
+
     console.log(socket.id, 'has joined');
     socket.on('disconnect', ()=>{
         console.log(socket.id, 'has left');
     })
 })
-
-secureServer.listen(1601, ()=>{
-    console.log("signaling server started");
-});
