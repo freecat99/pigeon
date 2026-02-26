@@ -3,34 +3,22 @@ import './App.css';
 
 import adapter from 'webrtc-adapter';
 import io from 'socket.io-client'
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 function App() {
 
   useEffect(()=>{
     io.connect('https://localhost:1601');
+  }, []);
 
-    
+  const buttonRef = useRef(null);
 
-  })
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <button ref={buttonRef}></button>
     </div>
   );
 }
 
+export const socket = io;
 export default App;
