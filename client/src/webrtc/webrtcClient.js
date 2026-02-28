@@ -25,15 +25,28 @@ let peerConfiguration = {
     ]
 }
 
-const handleClick = () => {
-  if (myElementRef.current) {
-    myElementRef.current.style.color = 'blue';
-  }
-};
-
 const call = async(e) => {
-    
+    await createPeerConnection();
 }
 
-buttonRef.addEventListener('click', call);
+const createPeerConnection = (offerObj) =>{
+    return new Promise(async(resolve, reject)=>{
+        peerConnection = new RTCPeerConnection(peerConfiguration);
+        dataChannel = peerConnection.createDataChannel();
+        
+        //enable send button when opened data channel
+        dataChannel.addEventListener('open', event=>{
+            bttnRef.disabled = false;
+        })
+
+        dataChannel.addEventListener('close', event=>{
+            bttnRef.disabled = true;
+        })
+
+        
+    })
+}
+
+fileRef.addEventListener('click', call);
+bttnRef.addEventListener('click', );
 
