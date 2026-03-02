@@ -1,8 +1,6 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -10,4 +8,23 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.videoFeed button{
+  height: 50px;
+  background-color: white;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  margin: 1rem;
+  cursor: pointer;
+}
+
+.videoFeed button:hover{
+  background-color: whitesmoke;
+}
+
+.videoFeed video{
+  background-color: black;
+  height: 300px;
+  width: 600px;
 }
