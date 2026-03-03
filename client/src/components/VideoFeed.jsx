@@ -1,10 +1,13 @@
-import React, { useEffect, useReducer, useRef } from 'react'
+import React, { useEffect, useReducer, useRef, useState } from 'react'
 
 function VideoFeed() {
     const streamRef = useRef(null);
     const videoRef = useRef(null);
     const captureStreamRef = useRef(null);
     const screenVideoRef = useRef(null);
+
+    const [gavePermission, setGavePermission] = useState(false);
+    const [devices, setDevices] = useState([]);
     
     const getFeed = async() => {
         
@@ -17,10 +20,15 @@ function VideoFeed() {
             const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
             streamRef.current = mediaStream;
             videoRef.current.srcObject = mediaStream;      
+            setGavePermission(true);
         } catch (error) {
             console.log("Unable to get user media");
         }
     };
+    
+    useEffect(()=>{
+       getDevices();
+    }, [gavePermission])
     
     const getScreen = async() => {
         const mediaOptions = {
@@ -42,6 +50,7 @@ function VideoFeed() {
             captureStreamRef.current = screen;
             screenVideoRef.current.srcObject = screen
 
+
             //listen for end share screen 
             screen.getVideoTracks()[0].onended = () => {
                 captureStreamRef.current = null;
@@ -61,13 +70,14 @@ function VideoFeed() {
             const tracks = screen.getVideoTracks();
 
             tracks.forEach(track =>{
-                track.enabled = false;
+                track.stop();
             })
 
         } catch (error) {
             console.log("Error in disable screen share")
         }
     }
+
     const toggleVideo = () => {
         try {
             const stream = streamRef.current;
@@ -83,6 +93,7 @@ function VideoFeed() {
             console.log("Error with media feed");
         }
     };
+
     const toggleAudio = () => {
         try {
             const stream = streamRef.current;
@@ -135,6 +146,62 @@ function VideoFeed() {
         }
     }
 
+    const getDevices = async() => {
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            setDevices(devices);
+
+            console.log("devices", devices);
+
+        } catch (error) {
+            console.log("Error in get devices")
+        }
+    }
+
+    const changeVideoInput = async(e) => {
+        const preferredDevice = e.target.value;
+
+        const deviceConstraints = {
+            audio: true,
+            video: {deviceId: {exact: preferredDevice}}
+        }
+
+        try {
+            const mediaStream = await navigator.mediaDevices.getUserMedia(deviceConstraints);
+            streamRef.current = mediaStream;
+            videoRef.current.srcObject = mediaStream;     
+
+        } catch (error) {
+            console.log("Error in choosing camera");
+        }
+    }
+    const changeAudioInput = async(e) => {
+        const preferredDevice = e.target.value;
+        
+        const deviceConstraints = {
+            video: true,
+            audio: {deviceId: {exact: preferredDevice}}
+        }
+
+        try {
+            const mediaStream = await navigator.mediaDevices.getUserMedia(deviceConstraints);
+            streamRef.current = mediaStream;
+            videoRef.current.srcObject = mediaStream;     
+
+        } catch (error) {
+            console.log("Error in choosing mic");
+        }
+    }
+    const changeAudioOutput = async(e) => {
+        const preferredDevice = e.target.value;
+        
+        try {
+            await videoRef.setSinkId(preferredDevice);    
+        } catch (error) {
+            console.log("Error in choosing speaker");
+        }
+
+    }
 
   return (
     <div className='videoFeed'>
@@ -150,6 +217,29 @@ function VideoFeed() {
         <option value="Good" selected>Good</option>
         <option value="Okay">Okay</option>
         <option value="Min">Min</option>
+      </select>
+      <label htmlFor="videoin">Select Camera: </label>
+      <select name="videoin" id="videoin" onChange={changeVideoInput}>
+        {devices.filter(device=>device.kind==="videoinput")
+            .map(device=>(
+                <option key={device.deviceId} value={device.deviceId}>{device.label}</option>
+            ))}
+      </select>
+      <label htmlFor="audioin">Select Mic: </label>
+      <select name="audioin" id="audioin" onChange={changeAudioInput}>
+        {devices.filter(device=>device.kind==='audioinput')
+            .map(device=>(
+                <option key={device.deviceId} value={device.deviceId}>{device.label}</option>
+            ))
+        }
+      </select>
+      <label htmlFor="audioout">Select Speaker: </label>
+      <select name="audioout" id="audioout" onChange={changeAudioOutput}>
+        {devices.filter(device=>device.kind==='audiooutput')
+            .map(device=>(
+                <option key={device.deviceId} value={device.deviceId}>{device.label}</option>
+            ))
+        }
       </select>
     </div>
   )
