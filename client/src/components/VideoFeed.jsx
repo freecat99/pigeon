@@ -8,7 +8,67 @@ function VideoFeed() {
 
     const [gavePermission, setGavePermission] = useState(false);
     const [devices, setDevices] = useState([]);
+    const peerConnectionRef = useRef(null);
+    let peerConfiguration = {
+        iceServers:[
+            {
+                urls:[
+                    "stun:stun3.l.google.com:5349",
+                    "stun:stun2.l.google.com:5349",
+                    "stun:stun2.l.google.com:19302" ,
+                    "stun:stun3.l.google.com:3478",
+                    "stun:stun4.l.google.com:5349",
+                    "stun:stun4.l.google.com:19302"
+                ]
+            }
+        ]
+    }
     
+
+    const createPeerConnection = async() => {
+        try {
+            peerConnectionRef.current = new RTCPeerConnection(peerConfiguration);
+
+            const remoteStream = new MediaStream();
+
+            peerConnectionRef.current.addEventListener('signalingstatechange', e=>{
+                console.log("Signaling state change");
+                console.log(e);
+                console.log(peerConnectionRef.current.signalingstate);
+            })
+
+            peerConnectionRef.current.addEventListener('icecandidate', e=>{
+                console.log("ice found", e);
+
+                if(e.candidate){
+                    socket.emit('sendingIceCandidateToSignalingSever', {
+                        iceCandidate: e.candidate,
+                        iceUsername: username,
+                        didIOffer: typeofcall === "offer"
+                    })
+                }
+
+            })
+           
+            peerConnectionRef.current.addEventListener('track', e=>{
+                
+                
+
+                if(e.candidate){
+                    socket.emit('sendingIceCandidateToSignalingSever', {
+                        iceCandidate: e.candidate,
+                        iceUsername: username,
+                        didIOffer: typeofcall === "offer"
+                    })
+                }
+
+            })
+
+        } catch (error) {
+            console.log("Error in create peer connection", error);
+        }
+    }
+
     const getFeed = async() => {
         
         const constraints = {
@@ -18,9 +78,20 @@ function VideoFeed() {
         
         try {
             const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+
             streamRef.current = mediaStream;
-            videoRef.current.srcObject = mediaStream;      
+            videoRef.current.srcObject = mediaStream;    
+
             setGavePermission(true);
+
+            await createPeerConnection();
+
+            const offer = await peerConnectionRef.current.createOffer();
+            console.log("offer", offer);
+
+
+
+
         } catch (error) {
             console.log("Unable to get user media");
         }
@@ -151,7 +222,7 @@ function VideoFeed() {
             const devices = await navigator.mediaDevices.enumerateDevices();
             setDevices(devices);
 
-            console.log("devices", devices);
+           // console.log("devices", devices);
 
         } catch (error) {
             console.log("Error in get devices")
