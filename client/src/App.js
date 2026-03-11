@@ -2,6 +2,7 @@ import './App.css';
 import io from 'socket.io-client'
 import { useEffect } from 'react';
 import VideoFeed from './components/VideoFeed.jsx';
+import Homepage from './pages/Homepage.jsx';
 
 function App() {
 
@@ -11,6 +12,7 @@ function App() {
 
   return (
     <div className="App">
+      <Homepage/>
       <VideoFeed/>
     </div>
   );

@@ -25,7 +25,7 @@ function VideoFeed() {
     }
     
 
-    const createPeerConnection = async() => {
+    /* const createPeerConnection = async() => {
         try {
             peerConnectionRef.current = new RTCPeerConnection(peerConfiguration);
 
@@ -67,7 +67,7 @@ function VideoFeed() {
         } catch (error) {
             console.log("Error in create peer connection", error);
         }
-    }
+    } */
 
     const getFeed = async() => {
         
@@ -84,7 +84,7 @@ function VideoFeed() {
 
             setGavePermission(true);
 
-            await createPeerConnection();
+            //await createPeerConnection();
 
             const offer = await peerConnectionRef.current.createOffer();
             console.log("offer", offer);
@@ -280,7 +280,7 @@ function VideoFeed() {
       <button onClick={getScreen}>Get Screen Share</button>
       <button onClick={toggleVideo}>Toggle Video</button>
       <button onClick={toggleAudio}>Toggle Audio</button>
-      <video src="" ref={videoRef} autoPlay playsInline></video>
+      <video src="" ref={videoRef} autoPlay playsInline muted></video>
       <button onClick={disableScreenShare}>End Share Screen</button>
       <video src="" ref={screenVideoRef} autoPlay playsInline muted></video>
       <select name="videoSize" id="videoSize" onChange={changeVideoSize}>
