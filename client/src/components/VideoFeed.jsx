@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react'
 
-function VideoFeed() {
+function VideoFeed({sendDataToCallpage}) {
     const streamRef = useRef(null);
     const videoRef = useRef(null);
     const captureStreamRef = useRef(null);
@@ -9,20 +9,7 @@ function VideoFeed() {
     const [gavePermission, setGavePermission] = useState(false);
     const [devices, setDevices] = useState([]);
     const peerConnectionRef = useRef(null);
-    let peerConfiguration = {
-        iceServers:[
-            {
-                urls:[
-                    "stun:stun3.l.google.com:5349",
-                    "stun:stun2.l.google.com:5349",
-                    "stun:stun2.l.google.com:19302" ,
-                    "stun:stun3.l.google.com:3478",
-                    "stun:stun4.l.google.com:5349",
-                    "stun:stun4.l.google.com:19302"
-                ]
-            }
-        ]
-    }
+    
     
 
     /* const createPeerConnection = async() => {
@@ -89,7 +76,8 @@ function VideoFeed() {
             const offer = await peerConnectionRef.current.createOffer();
             console.log("offer", offer);
 
-
+            //sending data to callpage
+            sendDataToCallpage(streamRef.current);
 
 
         } catch (error) {
