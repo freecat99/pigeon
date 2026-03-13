@@ -38,6 +38,10 @@ io.on('connection', (socket)=>{
         console.log("from server ", data);
     })
 
+    socket.on('offer', (from, to, offer)=>{
+        
+    })
+
     socket.on('disconnect', ()=>{
         console.log(socket.id, 'has left');
     })

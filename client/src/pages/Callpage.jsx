@@ -11,6 +11,7 @@ function Callpage() {
     const [gavePermission, setGavePermission] = useState(false);
     const [devices, setDevices] = useState([]);
     const peerConnectionRef = useRef(null);
+    const offerRef = useRef(null);
 
     const peerConfiguration = {
         iceServers:[
@@ -27,28 +28,53 @@ function Callpage() {
         ]
     }
 
-    const createPeerConnection = () => {
-        let pc = peerConnectionRef.current;
-
-        pc = new RTCPeerConnection(peerConfiguration);
-
-        //adding local stream to peer connection
-        localstreamRef.current.getTracks().forEach(track=>{
-            pc.addTrack(track, localstreamRef.current);
-        })
-
-        //listen for remote stream to add to pc
-        pc.ontrack = function(event){
-            remotestreamRef.current = event.streams[0];
-            remotevideoRef.current.srcObject = event.streams[0];
-        }
-
-        //listen to ICE candidates
-        pc.onicecandidate = function(event){
-            if(event.candidate){
-                
+    const createOffer = async() => {
+        
+        try {
+            if(!localstreamRef.current){
+                getFeed();
             }
+            else{
+
+                createPeerConnection();
+                offerRef.current = await peerConnectionRef.current.createOffer();
+                console.log("offer", offerRef.current);
+                await peerConnectionRef.current.setLocalDescription(offerRef.current);
+                socket.emit('offer', {from: "setThis", to: "setThis", offer: peerConnectionRef.localDescription});
+            }
+            
+        } catch (error) {
+            console.log("Error in createPeerConnection", error);
         }
+    }
+
+    const createPeerConnection = () => {
+
+        try {
+
+            peerConnectionRef.current = new RTCPeerConnection(peerConfiguration);
+    
+            //adding local stream to peer connection
+            localstreamRef.current.getTracks().forEach(track=>{
+                peerConnectionRef.current.addTrack(track, localstreamRef.current);
+            })
+    
+            //listen for remote stream to add to peerConnectionRef.current
+            peerConnectionRef.current.ontrack = function(event){
+                remotestreamRef.current = event.streams[0];
+                remotevideoRef.current.srcObject = event.streams[0];
+            }
+    
+            //listen to ICE candidates
+            peerConnectionRef.current.onicecandidate = function(event){
+                if(event.candidate){
+                    console.log("found candidate")   
+                }
+            }
+        } catch (error) {
+            console.log("Error in createPeerConnection", error);
+        }
+
 
     }
     
@@ -67,10 +93,7 @@ function Callpage() {
     
                 setGavePermission(true);
     
-                //await createPeerConnection();
-    
-                const offer = await peerConnectionRef.current.createOffer();
-                console.log("offer", offer);
+
     
     
     
@@ -262,6 +285,7 @@ function Callpage() {
         <button onClick={getScreen}>Get Screen Share</button>
         <button onClick={toggleVideo}>Toggle Video</button>
         <button onClick={toggleAudio}>Toggle Audio</button>
+        <button onClick={createOffer}>Start Call</button>
         <video src="" ref={localvideoRef} autoPlay playsInline muted></video>
         <video src="" ref={remotevideoRef} autoPlay playsInline></video>
         <button onClick={disableScreenShare}>End Share Screen</button>

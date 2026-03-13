@@ -15,7 +15,7 @@ function Homepage() {
 
   return (
     <div>
-      <button type='submit' onClick={startCall}>Start call</button>
+      <button type='submit' onClick={startCall}>Start socket call</button>
     </div>
   )
 }
