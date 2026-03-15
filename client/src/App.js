@@ -16,8 +16,6 @@ function App() {
   return (
     <div className="App">
       <Homepage/>
-      <Callpage/>
-      {/* <VideoFeed/> */}
     </div>
   );
 }
