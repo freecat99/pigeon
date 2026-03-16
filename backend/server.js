@@ -4,6 +4,7 @@ import http from 'http'; //we would need https as webrtc needs a secure protocol
 import express from 'express';
 import { config } from 'dotenv';
 import { Server } from 'socket.io';
+import { connectDB } from './utils/db.js';
 
 config();
 
@@ -23,8 +24,9 @@ const io = new Server(secureServer, {
     },
 });
 
-secureServer.listen(1601, ()=>{
-    console.log("signaling server started");
+secureServer.listen(1601, async()=>{
+    await connectDB();
+    console.log("backend socket server started");
 });
 
 

@@ -13,7 +13,7 @@ function Homepage() {
         console.log(callLink);
         socket.emit("start-call", socket.id);
         console.log(socket);
-        navigate('/call');
+        navigate(`/call/${callLink}`);
     }
 
 

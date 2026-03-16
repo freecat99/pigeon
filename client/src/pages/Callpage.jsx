@@ -40,7 +40,7 @@ function Callpage() {
                 offerRef.current = await peerConnectionRef.current.createOffer();
                 console.log("offer", offerRef.current);
                 await peerConnectionRef.current.setLocalDescription(offerRef.current);
-                socket.emit('offer', {from: "setThis", to: "setThis", offer: peerConnectionRef.localDescription});
+                socket.emit('offer', {from: socket.id, to: "setThis", offer: peerConnectionRef.localDescription});
             }
             
         } catch (error) {

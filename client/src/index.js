@@ -12,7 +12,7 @@ root.render(
   <BrowserRouter>
     <Routes>
       <Route path='/' element={<App/>}/>
-      <Route path='/call' element={<Callpage/>}/>
+      <Route path='/call/:id' element={<Callpage/>}/>
       <Route path='*' element={<FourZeroFour/>}/>
     </Routes>
   </BrowserRouter>
