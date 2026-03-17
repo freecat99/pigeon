@@ -24,8 +24,8 @@ const io = new Server(secureServer, {
     },
 });
 
-secureServer.listen(1601, async()=>{
-    await connectDB();
+secureServer.listen(1601, ()=>{
+    connectDB();
     console.log("backend socket server started");
 });
 
