@@ -5,15 +5,20 @@ import express from 'express';
 import { config } from 'dotenv';
 import { Server } from 'socket.io';
 import { connectDB } from './utils/db.js';
+import dbRouter from './routes/dbRoutes.js';
 
 config();
 
 const app = express();
 
-const key = fs.readFileSync('./certs/cert.key');
-const cert = fs.readFileSync('./certs/cert.crt');
+app.use(express.json());
 
-const secureServer =  http.createServer({key, cert}, app);
+app.use('/api/db', dbRouter);
+
+/* const key = fs.readFileSync('./certs/cert.key');
+const cert = fs.readFileSync('./certs/cert.crt'); */
+
+const secureServer =  http.createServer(app);
 
 
 
@@ -23,6 +28,8 @@ const io = new Server(secureServer, {
         methods: ["GET", "POST"],
     },
 });
+
+
 
 secureServer.listen(1601, ()=>{
     connectDB();
