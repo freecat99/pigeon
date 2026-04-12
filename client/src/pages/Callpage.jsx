@@ -28,20 +28,18 @@ function Callpage() {
         ]
     }
 
-    const createOffer = async() => {
+    const startCall = async() => {
         
         try {
             if(!localstreamRef.current){
                 getFeed();
             }
-            else{
 
                 createPeerConnection();
                 offerRef.current = await peerConnectionRef.current.createOffer();
                 console.log("offer", offerRef.current);
                 await peerConnectionRef.current.setLocalDescription(offerRef.current);
                 socket.emit('offer', {from: socket.id, to: "setThis", offer: peerConnectionRef.localDescription});
-            }
             
         } catch (error) {
             console.log("Error in createPeerConnection", error);
@@ -93,12 +91,8 @@ function Callpage() {
     
                 setGavePermission(true);
     
-
-    
-    
-    
             } catch (error) {
-                console.log("Unable to get user media");
+                console.log("Unable to get user media", error);
             }
         };
         
@@ -285,7 +279,7 @@ function Callpage() {
         <button onClick={getScreen}>Get Screen Share</button>
         <button onClick={toggleVideo}>Toggle Video</button>
         <button onClick={toggleAudio}>Toggle Audio</button>
-        <button onClick={createOffer}>Start Call</button>
+        <button onClick={startCall}>Start Call</button>
         <video src="" ref={localvideoRef} autoPlay playsInline muted></video>
         <video src="" ref={remotevideoRef} autoPlay playsInline></video>
         <button onClick={disableScreenShare}>End Share Screen</button>

@@ -48,6 +48,7 @@ io.on('connection', (socket)=>{
     })
 
     socket.on('offer', (from, to, offer)=>{
+        console.log({from, to, offer});
         
     })
 
