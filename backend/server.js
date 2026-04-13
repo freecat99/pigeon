@@ -43,7 +43,7 @@ io.on('connection', (socket)=>{
 
     console.log(socket.id, 'has joined');
 
-    socket.on('start-call', (data)=>{
+    socket.on('initiate-call', (data)=>{
         console.log("from server ", data);
     })
 
