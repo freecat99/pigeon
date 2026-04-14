@@ -13,6 +13,12 @@ function Callpage() {
     const peerConnectionRef = useRef(null);
     const offerRef = useRef(null);
 
+    const [user, setUser] = useState("");
+
+    const getUser=(e)=>{
+        setUser(e.target.value);
+    }
+
     const peerConfiguration = {
         iceServers:[
             {
@@ -31,6 +37,10 @@ function Callpage() {
     const startCall = async() => {
         
         try {
+            if(!user){
+                alert('set username first');
+                return;
+            }
             if(!localstreamRef.current){
                 getFeed();
             }
@@ -39,7 +49,7 @@ function Callpage() {
                 offerRef.current = await peerConnectionRef.current.createOffer();
                 console.log("offer", offerRef.current);
                 await peerConnectionRef.current.setLocalDescription(offerRef.current);
-                socket.emit('offer', {from: socket.id, to: "setThis", offer: peerConnectionRef.localDescription});
+                socket.emit('offer', {from: socket.id, to: user, offer: peerConnectionRef.localDescription});
             
         } catch (error) {
             console.log("Error in createPeerConnection", error);
@@ -273,47 +283,54 @@ function Callpage() {
     }
 
   return (
-    <div className='videoFeed'>
-        <h1>Hello callpage</h1>
-        <button onClick={getFeed}>Get Media Feed</button>
-        <button onClick={getScreen}>Get Screen Share</button>
-        <button onClick={toggleVideo}>Toggle Video</button>
-        <button onClick={toggleAudio}>Toggle Audio</button>
-        <button onClick={startCall}>Start Call</button>
-        <video src="" ref={localvideoRef} autoPlay playsInline muted></video>
-        <video src="" ref={remotevideoRef} autoPlay playsInline></video>
-        <button onClick={disableScreenShare}>End Share Screen</button>
-        <video src="" ref={screenVideoRef} autoPlay playsInline muted></video>
-        <select name="videoSize" id="videoSize" onChange={changeVideoSize}>
-          <option value="Max">Max</option>
-          <option value="Good" selected>Good</option>
-          <option value="Okay">Okay</option>
-          <option value="Min">Min</option>
-        </select>
-        <label htmlFor="videoin">Select Camera: </label>
-        <select name="videoin" id="videoin" onChange={changeVideoInput}>
-          {devices.filter(device=>device.kind==="videoinput")
-              .map(device=>(
-                  <option key={device.deviceId} value={device.deviceId}>{device.label}</option>
-              ))}
-        </select>
-        <label htmlFor="audioin">Select Mic: </label>
-        <select name="audioin" id="audioin" onChange={changeAudioInput}>
-          {devices.filter(device=>device.kind==='audioinput')
-              .map(device=>(
-                  <option key={device.deviceId} value={device.deviceId}>{device.label}</option>
-              ))
-          }
-        </select>
-        <label htmlFor="audioout">Select Speaker: </label>
-        <select name="audioout" id="audioout" onChange={changeAudioOutput}>
-          {devices.filter(device=>device.kind==='audiooutput')
-              .map(device=>(
-                  <option key={device.deviceId} value={device.deviceId}>{device.label}</option>
-              ))
-          }
-        </select>
-    </div>
+    <>
+    { user ? (
+        <div className='videoFeed'>
+            <h1>Hello callpage</h1>
+            <button onClick={getFeed}>Get Media Feed</button>
+            <button onClick={getScreen}>Get Screen Share</button>
+            <button onClick={toggleVideo}>Toggle Video</button>
+            <button onClick={toggleAudio}>Toggle Audio</button>
+            <video src="" ref={localvideoRef} autoPlay playsInline muted></video>
+            <video src="" ref={remotevideoRef} autoPlay playsInline></video>
+            <button onClick={disableScreenShare}>End Share Screen</button>
+            <video src="" ref={screenVideoRef} autoPlay playsInline muted></video>
+            <select name="videoSize" id="videoSize" onChange={changeVideoSize}>
+            <option value="Max">Max</option>
+            <option value="Good" selected>Good</option>
+            <option value="Okay">Okay</option>
+            <option value="Min">Min</option>
+            </select>
+            <label htmlFor="videoin">Select Camera: </label>
+            <select name="videoin" id="videoin" onChange={changeVideoInput}>
+            {devices.filter(device=>device.kind==="videoinput")
+                .map(device=>(
+                    <option key={device.deviceId} value={device.deviceId}>{device.label}</option>
+                ))}
+            </select>
+            <label htmlFor="audioin">Select Mic: </label>
+            <select name="audioin" id="audioin" onChange={changeAudioInput}>
+            {devices.filter(device=>device.kind==='audioinput')
+                .map(device=>(
+                    <option key={device.deviceId} value={device.deviceId}>{device.label}</option>
+                ))
+            }
+            </select>
+            <label htmlFor="audioout">Select Speaker: </label>
+            <select name="audioout" id="audioout" onChange={changeAudioOutput}>
+            {devices.filter(device=>device.kind==='audiooutput')
+                .map(device=>(
+                    <option key={device.deviceId} value={device.deviceId}>{device.label}</option>
+                ))
+            }
+            </select>
+        </div>):(
+        <div className="usernameFeed">
+            <input type="text" name="user" id="user" placeholder='enter username to join call!' required onChange={getUser}/>
+            <button onClick={startCall}>Start Call</button>
+        </div>
+        )}
+    </>
   )
 
 }
